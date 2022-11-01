@@ -10,17 +10,17 @@ using System.Media;
     
 namespace SPP_1
 {
-    public class MethodTrace
+    public class DiceMechsRealization
     {
-
+        private long traceTime;
         private const int MAX_DICE_VALUE = 20;
         private const int MIN_DICE_VALUE = 1;
         private readonly ITracer _tracer;
         private readonly CriticalRegister _criticalRegister;
 
-        internal MethodTrace(ITracer tracer)
+        internal DiceMechsRealization(ITracer tracer)
         {
-            _tracer = tracer;
+            _tracer = new MethodTracer();
             _criticalRegister = new CriticalRegister(_tracer);
         }
 
@@ -47,45 +47,59 @@ namespace SPP_1
                 }
             }
 
-
+            traceTime = _tracer.StopTrace();
+            _tracer.GetTraceResult(traceTime);
         }
     }
 
     public class CriticalRegister
     {
+        private long traceTime;
         private readonly ITracer _tracer;
         internal CriticalRegister(ITracer tracer)
         {
-            _tracer = tracer;
+            _tracer = new MethodTracer();
         }
 
         public void CriticalSuccess()
         {
+            
+            _tracer.StartTrace();
+
             if (OperatingSystem.IsWindows())
             {
                 SoundPlayer soundPlayer = new SoundPlayer("success.wav");
                 soundPlayer.Load();
-                soundPlayer.PlaySync();
+                soundPlayer.Play();
             }
             Console.WriteLine("Boom! You hit a twenty! What a lucky shot!");
-            
+
+            _tracer.StopTrace();
+            _tracer.GetTraceResult(traceTime);
         }
 
         public void CriticalFailure()
         {
+            _tracer.StartTrace();
+
             if (OperatingSystem.IsWindows())
             {
                 SoundPlayer soundPlayer = new SoundPlayer("failure.wav");
                 soundPlayer.Load();
-                soundPlayer.PlaySync();
+                soundPlayer.Play();
             }
             Console.WriteLine("Aww, you got one... Such a disappointment!");
+
+            traceTime = _tracer.StopTrace();
+            _tracer.GetTraceResult(traceTime);
         }
     }
 
-    public static class Main
+    public class DiceMechs
     {
-        MethodTrace methodTrace = new MethodTrace();
-        MethodTrace.HitCounter();
+        public static void Main()
+        {
+
+        }
     }
 }
