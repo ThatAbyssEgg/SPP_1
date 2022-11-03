@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,9 +24,9 @@ namespace SPP_1
     {
         void StartTrace();
 
-        long StopTrace();
+        TraceResult StopTrace(List<TraceResult> methods, string methodName, string className);
 
-        TraceResult GetTraceResult(long traceTime);
+        TraceResult GetTraceResult(TraceResult traceResult);
 
     }
 }

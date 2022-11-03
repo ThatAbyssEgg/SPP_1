@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Media;
+using System.Reflection;
 
 
 // All the sounds were taken from freesound.org
-    
+
 namespace SPP_1
 {
     public class DiceMechsRealization
@@ -17,6 +18,9 @@ namespace SPP_1
         private const int MIN_DICE_VALUE = 1;
         private readonly ITracer _tracer;
         private readonly CriticalRegister _criticalRegister;
+        private List<TraceResult> innerMethods = new List<TraceResult>();
+        private string methodName;
+        private string className;
 
         internal DiceMechsRealization(ITracer tracer)
         {
@@ -35,20 +39,22 @@ namespace SPP_1
             Random random = new Random();
             for (int i = 0; i < diceRolls; i++)
             {
-                currentRoll = random.Next(MIN_DICE_VALUE, MAX_DICE_VALUE);
+                currentRoll = random.Next(MIN_DICE_VALUE, MAX_DICE_VALUE + 1);
 
                 if (currentRoll == MAX_DICE_VALUE)
                 {
-                    _criticalRegister.CriticalSuccess();
+                    innerMethods.Add(_criticalRegister.CriticalSuccess());
                 }
                 else if (currentRoll == MIN_DICE_VALUE)
                 {
-                    _criticalRegister.CriticalFailure();
+                    innerMethods.Add(_criticalRegister.CriticalFailure());
                 }
             }
 
-            traceTime = _tracer.StopTrace();
-            _tracer.GetTraceResult(traceTime);
+            methodName = MethodBase.GetCurrentMethod().Name;
+            className = this.GetType().Name;
+
+            _tracer.GetTraceResult(_tracer.StopTrace(innerMethods, methodName, className));
         }
     }
 
@@ -56,12 +62,16 @@ namespace SPP_1
     {
         private long traceTime;
         private readonly ITracer _tracer;
+        private string methodName;
+        private string className;
+
         internal CriticalRegister(ITracer tracer)
         {
             _tracer = new MethodTracer();
+            className = this.GetType().Name;
         }
 
-        public void CriticalSuccess()
+        public TraceResult CriticalSuccess()
         {
             
             _tracer.StartTrace();
@@ -70,15 +80,17 @@ namespace SPP_1
             {
                 SoundPlayer soundPlayer = new SoundPlayer("success.wav");
                 soundPlayer.Load();
-                soundPlayer.Play();
+                soundPlayer.PlaySync();
             }
             Console.WriteLine("Boom! You hit a twenty! What a lucky shot!");
 
-            _tracer.StopTrace();
-            _tracer.GetTraceResult(traceTime);
+            methodName = MethodBase.GetCurrentMethod().Name;
+
+            ;
+            return _tracer.StopTrace(null, methodName, className);
         }
 
-        public void CriticalFailure()
+        public TraceResult CriticalFailure()
         {
             _tracer.StartTrace();
 
@@ -86,12 +98,13 @@ namespace SPP_1
             {
                 SoundPlayer soundPlayer = new SoundPlayer("failure.wav");
                 soundPlayer.Load();
-                soundPlayer.Play();
+                soundPlayer.PlaySync();
             }
             Console.WriteLine("Aww, you got one... Such a disappointment!");
 
-            traceTime = _tracer.StopTrace();
-            _tracer.GetTraceResult(traceTime);
+            methodName = MethodBase.GetCurrentMethod().Name;
+
+            return _tracer.StopTrace(null, methodName, className);
         }
     }
 
@@ -99,7 +112,9 @@ namespace SPP_1
     {
         public static void Main()
         {
-
+            ITracer tracer = new MethodTracer();
+            DiceMechsRealization diceMechsRealization = new DiceMechsRealization(tracer);
+            diceMechsRealization.HitCounter();
         }
     }
 }
