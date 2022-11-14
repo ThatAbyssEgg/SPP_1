@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using SPP_1.Tracing;
 
-namespace SPP_1
+namespace SPP_1.Serialization
 {
-    internal class XMLSerialize : ISerialize
+    public class TraceToXmlSerializer : ITraceSerializer
     {
-        public string Deserialize(TraceResult traceResult)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async void Serialize(TraceResult traceResult)
+        public void Serialize(TraceResult traceResult)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(TraceResult));
-            
+
             using (FileStream fs = new FileStream("data.xml", FileMode.OpenOrCreate))
             {
                 serializer.Serialize(fs, traceResult);

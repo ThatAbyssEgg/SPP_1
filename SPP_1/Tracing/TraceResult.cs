@@ -1,6 +1,12 @@
-﻿namespace SPP_1
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SPP_1.Tracing
 {
-    public struct TraceResult
+    public class TraceResult
     {
         private string methodName;
         private string className;
@@ -11,15 +17,5 @@
         public string ClassName { get => className; set => className = value; }
         public long ExecutionTime { get => executionTime; set => executionTime = value; }
         public List<TraceResult> InnerMethods { get => innerMethods; set => innerMethods = value; }
-    }
-
-    public interface ITracer
-    {
-        void StartTrace();
-
-        TraceResult StopTrace(List<TraceResult> methods, string methodName, string className);
-
-        TraceResult GetTraceResult(TraceResult traceResult);
-
     }
 }
