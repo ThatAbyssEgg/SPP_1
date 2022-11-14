@@ -14,13 +14,36 @@ namespace SPP_1
     public class DiceMechsRealization
     {
         private long traceTime;
-        private const int MAX_DICE_VALUE = 20;
-        private const int MIN_DICE_VALUE = 1;
         private readonly ITracer _tracer;
         private readonly CriticalRegister _criticalRegister;
         private List<TraceResult> innerMethods = new List<TraceResult>();
         private string methodName;
         private string className;
+
+        private const int MAX_DICE_VALUE = 20;
+        private const int MIN_DICE_VALUE = 1;
+
+        public bool IsJsonOutput()
+        {
+            Console.WriteLine("Choose input method:");
+            Console.WriteLine("0: XML");
+            Console.WriteLine("1: JSON");
+
+            string userChoice = Console.ReadLine();
+
+            if (userChoice == "1")
+            {
+                return true;
+            }
+            else if (userChoice == "0")
+            {
+                return false;
+            }
+            else
+            {
+                throw new Exception("Wrong input.");
+            }
+        }
 
         internal DiceMechsRealization(ITracer tracer)
         {
@@ -54,13 +77,25 @@ namespace SPP_1
             methodName = MethodBase.GetCurrentMethod().Name;
             className = this.GetType().Name;
 
-            _tracer.GetTraceResult(_tracer.StopTrace(innerMethods, methodName, className));
+            TraceResult result = _tracer.GetTraceResult(_tracer.StopTrace(innerMethods, methodName, className));
+
+            if (IsJsonOutput())
+            {
+                JsonSerialize jsonSerialize = new JsonSerialize();
+                jsonSerialize.Serialize(result);
+            }
+            else
+            {
+                XMLSerialize xmlSerialize = new XMLSerialize();
+                xmlSerialize.Serialize(result);
+            }
+
+
         }
     }
 
     public class CriticalRegister
     {
-        private long traceTime;
         private readonly ITracer _tracer;
         private string methodName;
         private string className;
@@ -86,7 +121,6 @@ namespace SPP_1
 
             methodName = MethodBase.GetCurrentMethod().Name;
 
-            ;
             return _tracer.StopTrace(null, methodName, className);
         }
 
@@ -108,7 +142,7 @@ namespace SPP_1
         }
     }
 
-    public class DiceMechs
+    public class Program
     {
         public static void Main()
         {

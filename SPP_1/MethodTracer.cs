@@ -11,6 +11,7 @@ namespace SPP_1
     public class MethodTracer : ITracer
     {
         Stopwatch sw = null;
+
         public TraceResult GetTraceResult(TraceResult traceResult)
         {
             Console.WriteLine("Class name: " + traceResult.ClassName);
@@ -42,9 +43,7 @@ namespace SPP_1
         {
             sw.Stop();
             TraceResult traceResult = new TraceResult();
-            //traceResult.MethodName = MethodBase.GetCurrentMethod().Name;
             traceResult.MethodName = methodName;
-            //traceResult.ClassName = this.GetType().Name;
             traceResult.ClassName = className;
             traceResult.ExecutionTime = sw.ElapsedMilliseconds;
             if (innerMethods != null)
