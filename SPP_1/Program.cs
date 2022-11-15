@@ -42,7 +42,7 @@ namespace SPP_1
             }
             else
             {
-                throw new Exception("Wrong input.");
+                throw new ArgumentException("Input data does not match the requirements.");
             }
         }
     }

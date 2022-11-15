@@ -54,8 +54,7 @@ namespace SPP_1
         {
             if (TraceResult == null)
             {
-                //
-                throw new Exception("Пщшел нахуй");
+                throw new ArgumentNullException(nameof(TraceResult));
             }
 
             traceSerializer.Serialize(TraceResult);
